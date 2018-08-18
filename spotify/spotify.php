@@ -5,7 +5,6 @@ require_once 'vendor/autoload.php';
 require_once 'settings.php';
 
 session_start();
-echo "<br>";
 
 if (isset($_GET['cmd']) && $_GET['cmd'] == "logout") {
 	unset($_SESSION['spotifyToken']);
@@ -33,9 +32,8 @@ if (isset($_GET['code']) && $_GET['code'] != ""){
 	$token=$response->body->access_token;
 	if ($token!="") {
 		$_SESSION['spotifyToken'] = $token;
-
 		// the redirect clears the token from the url
-		header("Location: spotify.php");
+		//header("Location: spotify.php");
 	} else {
 		print "Error getting token";
 		exit();
@@ -43,13 +41,17 @@ if (isset($_GET['code']) && $_GET['code'] != ""){
 }
 
 // check to see if we have a validated token in the session.
-if (!isset($_SESSION['spotifyToken']) || $_SESSION['spotifyToken'] = '') {
+if (!isset($_SESSION['spotifyToken']) || $_SESSION['spotifyToken'] == '') {
 	$url = 'https://accounts.spotify.com/authorize/?';
 	$url .= "client_id=".$creds['id']."&response_type=code&";
 	$url .= "redirect_uri=http://preznix.shawnrast.com/playlists/spotify/spotify.php";
 	$url .= '&scope=playlist-read-private';
 	header("Location: $url");
 } 
+
+
+$token = $_SESSION['spotifyToken'];
+echo $token;
 ?>
 
 <html>
@@ -75,8 +77,22 @@ if (!isset($_SESSION['spotifyToken']) || $_SESSION['spotifyToken'] = '') {
  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
 
 <script>
-var token="<?echo $token;?>";
-var clientID="<?echo $clientID;?>";
+var token='<?php echo $token;?>';
+</script>
+<script>
+$.ajax({
+	url: 'https://api.spotify.com/v1/me/playlists',
+	method: 'GET',
+	headers: {
+		'Authorization' : 'Bearer ' + token
+	},
+	success: function(response){
+		console.log(response);
+	},
+	error: function(error){
+		console.log(error);
+	}
+});
 </script>
 <body>
 if you see this oAuth worked
