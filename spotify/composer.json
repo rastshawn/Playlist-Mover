@@ -1,0 +1,6 @@
+{
+    "name": "shawn/spotify",
+    "require": {
+		"nategood/httpful": "*"
+	}
+}
