@@ -2,56 +2,16 @@
 
 require_once 'credentials.php';
 require_once 'vendor/autoload.php';
-require_once 'settings.php';
 
 session_start();
 
-if (isset($_GET['cmd']) && $_GET['cmd'] == "logout") {
-	unset($_SESSION['spotifyToken']);
-	exit();
-}
 
-// if the access code has been granted, get the authentication token
-if (isset($_GET['code']) && $_GET['code'] != ""){
-	$code = $_GET['code'];
-	
-	$data = array(
-
-		'grant_type'=>'authorization_code',
-		'code'=>$code,
-		'redirect_uri'=>'http://preznix.shawnrast.com/playlists/spotify/spotify.php',
-		'client_id'=>$creds['id'],
-		'client_secret'=>$creds['secret']
-	);
-	$response = \Httpful\Request::post("https://accounts.spotify.com/api/token")
-		->body(http_build_query($data))
-	//	->addHeader('Authorization', 'Basic '.base64_encode($creds['id'].':'.$creds['secret']))
-		->addHeader('Content-Type','application/x-www-form-urlencoded')
-		->expectsJson()
-		->send();
-	$token=$response->body->access_token;
-	if ($token!="") {
-		$_SESSION['spotifyToken'] = $token;
-		// the redirect clears the token from the url
-		//header("Location: spotify.php");
-	} else {
-		print "Error getting token";
-		exit();
-	}
-}
-
-// check to see if we have a validated token in the session.
-if (!isset($_SESSION['spotifyToken']) || $_SESSION['spotifyToken'] == '') {
-	$url = 'https://accounts.spotify.com/authorize/?';
-	$url .= "client_id=".$creds['id']."&response_type=code&";
-	$url .= "redirect_uri=http://preznix.shawnrast.com/playlists/spotify/spotify.php";
-	$url .= '&scope=playlist-read-private';
-	header("Location: $url");
-} 
-
-
+// Authenticate the user with oAuth. 
+require_once 'oAuth.php';
+// if the user is at this line, they should have a token. 
 $token = $_SESSION['spotifyToken'];
-echo $token;
+
+
 ?>
 
 <html>
