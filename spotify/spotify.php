@@ -93,8 +93,20 @@ var Song = new function() {
 
 getPlaylists()
 	.then(function(response) {
+		$("#playlists").append("<ul>");
 		response.forEach(function(playlist) {
-			$("#playlists").append(playlist.name + "<br>");
+			$("#playlists").append(
+				"<li class='playlist' " + 
+				"spotifyID='" + playlist.id + "'>"+ 
+				playlist.name + "</li>"		
+			);
+		});
+		$("#playlists").append("</ul>");
+		$(".playlist").click(function(e){
+			var playlistID = e.target.attributes.spotifyID.value;
+			getTracks(playlistID).then(function(resolve) {
+				console.log(resolve);
+			});
 		});
 	}, function(error) {
 		console.log(error);
