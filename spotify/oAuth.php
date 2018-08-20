@@ -46,7 +46,7 @@ if (!isset($_SESSION['spotifyToken']) || $_SESSION['spotifyToken'] == '') {
 	$url = 'https://accounts.spotify.com/authorize/?';
 	$url .= "client_id=".$creds['id']."&response_type=code&";
 	$url .= "redirect_uri=http://preznix.shawnrast.com/playlists/spotify/spotify.php";
-	$url .= '&scope=playlist-read-private';
+	$url .= '&scope=playlist-read-private user-top-read';
 	header("Location: $url");
 } 
 

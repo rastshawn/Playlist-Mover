@@ -83,11 +83,11 @@ function getPlaylists() {
 	var uri = "https://api.spotify.com/v1/me/playlists";
 	return getAll(uri);
 }
-var Song = new function() {
+function Song() {
 	this.title;
 	this.artist;
 	this.album;
-	this.id;
+	this.spotifyId;
 }
 
 
@@ -104,8 +104,18 @@ getPlaylists()
 		$("#playlists").append("</ul>");
 		$(".playlist").click(function(e){
 			var playlistID = e.target.attributes.spotifyID.value;
+			var tracks = [];
 			getTracks(playlistID).then(function(resolve) {
-				console.log(resolve);
+				resolve.forEach(function(track) {
+					var trackToAdd = new Song();
+					trackToAdd.title = track.track.name;
+					trackToAdd.artists = track.track.artists;
+					trackToAdd.album = track.track.album.name;
+					trackToAdd.spotifyId = track.track.id;
+					tracks.push(trackToAdd);
+				});
+
+				console.log(tracks);
 			});
 		});
 	}, function(error) {
