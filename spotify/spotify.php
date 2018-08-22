@@ -83,16 +83,48 @@ function getPlaylists() {
 	var uri = "https://api.spotify.com/v1/me/playlists";
 	return getAll(uri);
 }
-function Song() {
-	this.title;
-	this.artist;
-	this.album;
-	this.spotifyId;
+
+
+///// OBJECTS
+function Song(title, artists, album, source) {
+	this.title = title;
+	this.artists = artists;
+	this.album = album;
+	this.source = source;
+}
+function Playlist(name, songs) {
+	this.name = name;
+	this.songs = songs;
+}
+function Source(service, id) {
+	this.service = service;
+	this.id = id;
 }
 
 
+function playlistClick(e) {
+	var playlistID = e.target.attributes.spotifyID.value;
+	var tracks = [];
+	getTracks(playlistID).then(function(resolve) {
+		resolve.forEach(function(track) {
+			var source = new Source("spotify", track.track.id);		
+			var trackToAdd = new Song(
+				track.track.name, 
+				track.track.artists,
+				track.track.album.name,
+				source
+			);
+			tracks.push(trackToAdd);
+		});
+
+		var newPlaylist = new Playlist("output", tracks);
+		console.log(newPlaylist);
+	});
+}
+
 getPlaylists()
 	.then(function(response) {
+		/* make the list */
 		$("#playlists").append("<ul>");
 		response.forEach(function(playlist) {
 			$("#playlists").append(
@@ -102,25 +134,14 @@ getPlaylists()
 			);
 		});
 		$("#playlists").append("</ul>");
-		$(".playlist").click(function(e){
-			var playlistID = e.target.attributes.spotifyID.value;
-			var tracks = [];
-			getTracks(playlistID).then(function(resolve) {
-				resolve.forEach(function(track) {
-					var trackToAdd = new Song();
-					trackToAdd.title = track.track.name;
-					trackToAdd.artists = track.track.artists;
-					trackToAdd.album = track.track.album.name;
-					trackToAdd.spotifyId = track.track.id;
-					tracks.push(trackToAdd);
-				});
-
-				console.log(tracks);
-			});
-		});
+		
+		/* add click listener */
+		$(".playlist").click(playlistClick);
 	}, function(error) {
 		console.log(error);
-	});
+	}
+);
+
 </script>
 <body>
 	<div id="playlists"></div>
